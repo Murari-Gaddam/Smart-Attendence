@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faculty Dashboard • QR‑Attend+</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #e6eefc;
+      --muted: #9fb3d9;
+      --primary: #5b8cff;
+      --accent: #22d3ee;
+      --good: #86efac;
+      --bad: #ff6b6b;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .user {
+      font-size: 14px;
+      color: var(--muted);
+      margin-right: 12px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 16px;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    input,
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border: none;
+      color: #071220;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .session {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .msg {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    canvas {
+      margin-top: 12px;
+    }
+    #activeSessionDisplay {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--good);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#activeSessionDisplay code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: monospace;
+  color: var(--accent);
+}
+.createmsg {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+  color: #071220;
+  font-weight: 800;
+  font-size: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">QR‑Attend+ • Faculty</div>
+    <div class="row">
+      <div class="user" id="userInfo">Faculty</div>
+      <button class="ghost" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Create New Session</h2>
+      <input id="titleInput" placeholder="Session title" />
+      <input id="codeInput" placeholder="Session code (e.g., ABC123)" />
+      <input id="timeInput" placeholder="Time (e.g., 10:00 AM)" />
+      <button id="createSessionBtn">Create Session</button>
+      <div id="createMsg" class="msg"></div>
+      <canvas id="qrCanvas" style="margin-top:12px;"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Active Session</h2>
+      <div id="activeSessionDisplay" class="msg">No active session yet.</div>
+    </section>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    <script>
+      document.getElementById("createSessionBtn").addEventListener("click", () => {
+        const title = document.getElementById("titleInput").value.trim();
+        const code = document.getElementById("codeInput").value.trim();
+        const time = document.getElementById("timeInput").value.trim();
+        const msg = document.getElementById("createMsg");
+
+        if (!title || !code || !time) {
+          msg.textContent = "⚠️ Please fill all fields";
+          return;
+        }
+
+        // Simulate session creation (frontend-only)
+        msg.textContent = `✅ Session "${title}" created with code: ${code} at ${time}`;
+
+        // Generate QR code for the session code
+        const canvas = document.getElementById("qrCanvas");
+        QRCode.toCanvas(canvas, code, function (error) {
+          if (error) {
+            console.error("QR generation failed:", error);
+            msg.textContent = "❌ Failed to generate QR.";
+          } else {
+            console.log("QR generated!");
+          }
+        });
+      });
+      document.getElementById("createSessionBtn").addEventListener("click", () => {
+  const title = document.getElementById("titleInput").value.trim();
+  const code = document.getElementById("codeInput").value.trim();
+  const time = document.getElementById("timeInput").value.trim();
+  const msg = document.getElementById("createMsg");
+  const activeDisplay = document.getElementById("activeSessionDisplay");
+
+  if (!title || !code || !time) {
+    msg.textContent = "⚠️ Please fill all fields";
+    return;
+  }
+
+  // Simulate session creation
+  msg.textContent = `✅ Session "${title}" created with code: ${code} at ${time}`;
+
+  // Update active session display
+  activeDisplay.innerHTML = `
+    <strong>${title}</strong><br>
+    Code: <code>${code}</code><br>
+    Time: ${time}<br>
+    Status: ✅ Active
+  `;
+  
+
+  // Generate QR code
+  const canvas = document.getElementById("qrCanvas");
+  QRCode.toCanvas(canvas, code, function (error) {
+    if (error) {
+      console.error("QR generation failed:", error);
+      msg.textContent = "❌ Failed to generate QR.";
+    } else {
+      console.log("QR generated!");
+    }
+  });
+  titleInput.value = "";
+  codeInput.value = "";
+  timeInput.value = "";
+});
+
+    </script>
+</body>
+
+</html>
